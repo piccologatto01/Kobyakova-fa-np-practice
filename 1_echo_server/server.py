@@ -1,4 +1,5 @@
 import socket
+import threading
 
 sock = socket.socket()
 sock.bind(('', 9090))
@@ -7,13 +8,17 @@ conn, addr = sock.accept()
 print(addr)
 
 msg = ''
-
-while True:
+def router():
 	data = conn.recv(1024)
-	if not data:
-		break
 	msg += data.decode()
 	conn.send(data)
+	if not data:
+		conn.close()
+
+while True:
+	t = threading.Thread(router)
+	t.start()
+	
 
 print(msg)
 
